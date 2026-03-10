@@ -9,8 +9,7 @@ from typing import TYPE_CHECKING
 import torch
 
 from mjlab.entity import Entity
-from mjlab.managers.command_manager import CommandTerm
-from mjlab.managers.manager_term_config import CommandTermCfg
+from mjlab.managers.command_manager import CommandTerm, CommandTermCfg
 from mjlab.third_party.isaaclab.isaaclab.utils.math import (
     combine_frame_transforms,
     compute_pose_error,
@@ -35,7 +34,7 @@ class UniformPoseCommand(CommandTerm):
     def __init__(self, cfg: UniformPoseCommandCfg, env: ManagerBasedRlEnv):
         super().__init__(cfg, env)
 
-        self.robot: Entity = env.scene[cfg.asset_name]
+        self.robot: Entity = env.scene[cfg.entity_name]
         self.body_idx = self.robot.find_bodies(cfg.body_name)[0][0]
 
         # Create buffers: commands (x, y, z, qw, qx, qy, qz) in root frame
@@ -97,10 +96,9 @@ class UniformPoseCommand(CommandTerm):
 
 @dataclass(kw_only=True)
 class UniformPoseCommandCfg(CommandTermCfg):
-    asset_name: str
+    entity_name: str
     body_name: str
     make_quat_unique: bool = False
-    class_type: type[CommandTerm] = UniformPoseCommand
 
     @dataclass
     class Ranges:
@@ -112,6 +110,9 @@ class UniformPoseCommandCfg(CommandTermCfg):
         yaw: tuple[float, float]
 
     ranges: Ranges
+
+    def build(self, env: ManagerBasedRlEnv) -> UniformPoseCommand:
+        return UniformPoseCommand(self, env)
 
 
 # custom UniformWorldPoseCommand
@@ -306,7 +307,6 @@ class UniformWorldPoseCommand(UniformPoseCommand):
 class UniformWorldPoseCommandCfg(UniformPoseCommandCfg):
     se3_decrease_vel_range: tuple[float, float] = (0.5, 1.4)
     resampling_time_scale: tuple[float, float] = (6.0, 15.0)
-    class_type: type[CommandTerm] = UniformWorldPoseCommand
 
     @dataclass
     class Ranges:
@@ -323,3 +323,6 @@ class UniformWorldPoseCommandCfg(UniformPoseCommandCfg):
         yaw: tuple[float, float] = field(default=(-3.14, 3.14), init=False)
 
     ranges: Ranges
+
+    def build(self, env: ManagerBasedRlEnv) -> UniformWorldPoseCommand:
+        return UniformWorldPoseCommand(self, env)

@@ -5,8 +5,8 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "mjlab",
+    "mjlab>=1.2.0",
 ]
 
-[tool.uv.sources]
-mjlab = { path = "../../mjlab", editable = true }
+[project.entry-points."mjlab.tasks"]
+tron1_rl_mjlab = "tron1_rl_mjlab.tasks"
