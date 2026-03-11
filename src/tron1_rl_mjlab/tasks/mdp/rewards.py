@@ -1,17 +1,12 @@
 """Reward functions for the task."""
 
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
 import torch
 
 from mjlab.entity import Entity
 from mjlab.managers.scene_entity_config import SceneEntityCfg
 from mjlab.utils.lab_api.math import quat_apply_inverse
 
-if TYPE_CHECKING:
-    from mjlab.envs.manager_based_rl_env import ManagerBasedRlEnv
+from mjlab.envs.manager_based_rl_env import ManagerBasedRlEnv
 
 _DEFAULT_ASSET_CFG = SceneEntityCfg("robot")
 

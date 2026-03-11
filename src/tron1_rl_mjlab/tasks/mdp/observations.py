@@ -1,9 +1,5 @@
 """Observation functions for the robot."""
 
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
-
 import torch
 
 from mjlab.entity import Entity
@@ -13,15 +9,13 @@ from mjlab.utils.lab_api.math import (
     quat_unique,
 )
 
-if TYPE_CHECKING:
-    from mjlab.envs.manager_based_env import ManagerBasedEnv
-    from mjlab.envs.manager_based_rl_env import ManagerBasedRlEnv
+from mjlab.envs.manager_based_rl_env import ManagerBasedRlEnv
 
 _DEFAULT_ASSET_CFG = SceneEntityCfg("robot")
 
 
 def joint_acc(
-        env: ManagerBasedEnv,
+        env: ManagerBasedRlEnv,
         asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
 ) -> torch.Tensor:
     asset: Entity = env.scene[asset_cfg.name]
@@ -30,7 +24,7 @@ def joint_acc(
 
 
 def actuator_force(
-        env: ManagerBasedEnv,
+        env: ManagerBasedRlEnv,
         asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
 ) -> torch.Tensor:
     asset: Entity = env.scene[asset_cfg.name]
@@ -40,7 +34,7 @@ def actuator_force(
 
 
 def body_lin_vel(
-        env: ManagerBasedEnv,
+        env: ManagerBasedRlEnv,
         asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
 ) -> torch.Tensor:
     asset: Entity = env.scene[asset_cfg.name]
@@ -49,7 +43,7 @@ def body_lin_vel(
 
 
 def joint_stiffness(
-        env: ManagerBasedEnv,
+        env: ManagerBasedRlEnv,
         asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
 ) -> torch.Tensor:
     asset: Entity = env.scene[asset_cfg.name]
@@ -58,7 +52,7 @@ def joint_stiffness(
 
 
 def joint_damping(
-        env: ManagerBasedEnv,
+        env: ManagerBasedRlEnv,
         asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
 ) -> torch.Tensor:
     asset: Entity = env.scene[asset_cfg.name]

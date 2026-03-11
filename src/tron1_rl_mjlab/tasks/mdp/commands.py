@@ -1,10 +1,7 @@
 """Custom command terms for the task."""
 
-from __future__ import annotations
-
 from collections.abc import Sequence
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING
 
 import torch
 
@@ -22,8 +19,7 @@ from mjlab.utils.lab_api.math import (
     sample_uniform,
 )
 
-if TYPE_CHECKING:
-    from mjlab.envs.manager_based_rl_env import ManagerBasedRlEnv
+from mjlab.envs.manager_based_rl_env import ManagerBasedRlEnv
 
 
 # UniformPoseCommand from IsaacLab

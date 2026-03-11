@@ -1,9 +1,6 @@
 """Custom action terms for the task."""
 
-from __future__ import annotations
-
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
 
 import torch
 
@@ -11,8 +8,7 @@ from mjlab.actuator.actuator import TransmissionType
 from mjlab.envs.mdp.actions.actions import BaseActionCfg, BaseAction
 from mjlab.managers.action_manager import ActionTerm
 
-if TYPE_CHECKING:
-    from mjlab.envs.manager_based_env import ManagerBasedEnv
+from mjlab.envs.manager_based_rl_env import ManagerBasedRlEnv
 
 
 class JointVelocityAction(BaseAction):
@@ -20,7 +16,7 @@ class JointVelocityAction(BaseAction):
 
     cfg: JointVelocityActionCfg
 
-    def __init__(self, cfg: JointVelocityActionCfg, env: ManagerBasedEnv):
+    def __init__(self, cfg: JointVelocityActionCfg, env: ManagerBasedRlEnv):
         super().__init__(cfg=cfg, env=env)
 
         if cfg.use_default_offset:
@@ -44,5 +40,5 @@ class JointVelocityActionCfg(BaseActionCfg):
     def __post_init__(self):
         self.transmission_type = TransmissionType.JOINT
 
-    def build(self, env: ManagerBasedEnv) -> JointVelocityAction:
+    def build(self, env: ManagerBasedRlEnv) -> JointVelocityAction:
         return JointVelocityAction(self, env)
