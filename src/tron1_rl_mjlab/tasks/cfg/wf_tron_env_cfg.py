@@ -150,8 +150,6 @@ def make_observations() -> dict[str, ObservationGroupCfg]:
             params={"asset_cfg": SceneEntityCfg("robot", body_names="wheel_.*")},
             scale=0.1
         ),
-        "joint_stiffness": ObservationTermCfg(func=mdp.joint_stiffness, scale=0.025),
-        "joint_damping": ObservationTermCfg(func=mdp.joint_damping, scale=1.0),
         "base_height_error": ObservationTermCfg(func=mdp.base_height_error, scale=3.0),
         "foot_rel_position_w": ObservationTermCfg(func=mdp.foot_rel_position_w, scale=1.5),
         "contact_force": ObservationTermCfg(
@@ -162,22 +160,12 @@ def make_observations() -> dict[str, ObservationGroupCfg]:
     }
 
     return {
-        "commands": ObservationGroupCfg(
-            terms=commands_terms,
-            enable_corruption=False,
-            concatenate_terms=True,
-        ),
-        "policy": ObservationGroupCfg(
-            terms=policy_terms,
-            enable_corruption=True,
-            concatenate_terms=True,
-        ),
-        "history": ObservationGroupCfg(
-            terms=policy_terms,
+        "actor": ObservationGroupCfg(
+            terms=commands_terms | policy_terms,
             enable_corruption=True,
             concatenate_terms=True,
             history_length=20,
-            flatten_history_dim=False,
+            flatten_history_dim=True,
         ),
         "critic": ObservationGroupCfg(
             terms=critic_terms,
@@ -433,6 +421,7 @@ SIM_CFG = SimulationCfg(
         timestep=0.005,
         iterations=1,
     ),
+    contact_sensor_maxmatch=100,  # Increase max contacts from default 50 to avoid overflow warnings
 )
 
 

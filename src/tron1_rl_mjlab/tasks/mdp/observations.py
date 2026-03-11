@@ -6,6 +6,7 @@ import torch
 
 from mjlab.entity import Entity
 from mjlab.managers.scene_entity_config import SceneEntityCfg
+from mjlab.sensor import ContactSensor
 from mjlab.utils.lab_api.math import (
     matrix_from_quat,
     quat_unique,
@@ -44,24 +45,6 @@ def body_lin_vel(
     return asset.data.body_link_lin_vel_w[:, body_ids].flatten(start_dim=1)
 
 
-def joint_stiffness(
-        env: ManagerBasedRlEnv,
-        asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
-) -> torch.Tensor:
-    asset: Entity = env.scene[asset_cfg.name]
-    jnt_ids = asset_cfg.joint_ids
-    return asset.data.default_joint_stiffness[:, jnt_ids]
-
-
-def joint_damping(
-        env: ManagerBasedRlEnv,
-        asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
-) -> torch.Tensor:
-    asset: Entity = env.scene[asset_cfg.name]
-    jnt_ids = asset_cfg.joint_ids
-    return asset.data.default_joint_damping[:, jnt_ids]
-
-
 def base_height_error(
         env: ManagerBasedRlEnv,
         asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
@@ -98,9 +81,10 @@ def contact_forces(
         asset_cfg: SceneEntityCfg = _DEFAULT_ASSET_CFG,
         sensor_name: str = "contact_sensors",
 ) -> torch.Tensor:
-    robot: Entity = env.scene[asset_cfg.name]
-    contact_force = robot.data.sensor_data[sensor_name]
-    return contact_force.flatten(start_dim=1)
+    sensor: ContactSensor = env.scene[sensor_name]
+    sensor_data = sensor.data
+    assert sensor_data.force is not None, f"Contact sensor '{sensor_name}' has no force data"
+    return sensor_data.force.flatten(start_dim=1)
 
 
 def base_commands_b(

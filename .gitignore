@@ -11,3 +11,8 @@ wheels/
 
 # IDE files
 .idea
+.vscode
+
+# Logs
+logs/
+wandb/
