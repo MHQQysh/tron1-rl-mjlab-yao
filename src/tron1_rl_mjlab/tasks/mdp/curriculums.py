@@ -1,5 +1,7 @@
 """Curriculum functions for the task."""
 
+from __future__ import annotations
+
 import torch
 
 from mjlab.entity import Entity
