@@ -1,8 +1,9 @@
 from pathlib import Path
 import mujoco
 
+from mjlab.actuator import BuiltinPositionActuatorCfg, BuiltinVelocityActuatorCfg
 from mjlab.entity import Entity, EntityCfg, EntityArticulationInfoCfg
-from mjlab.utils.spec_config import ActuatorCfg, ContactSensorCfg
+from mjlab.sensor import ContactMatch, ContactSensorCfg
 
 current_dir: Path = Path(__file__).parent.resolve()
 
@@ -14,17 +15,16 @@ def get_spec() -> mujoco.MjSpec:
     return mujoco.MjSpec.from_file(str(WF_TRON_XML))
 
 
-WF_TRON_LEG_ACTUATORS = ActuatorCfg(
-    joint_names_expr=["abad_[RL]_Joint", "hip_[RL]_Joint", "knee_[RL]_Joint"],
+WF_TRON_LEG_ACTUATORS = BuiltinPositionActuatorCfg(
+    target_names_expr=("abad_[RL]_Joint", "hip_[RL]_Joint", "knee_[RL]_Joint"),
     effort_limit=80.0,
     stiffness=40.0,
     damping=1.8,
 )
 
-WF_TRON_WHEEL_ACTUATORS = ActuatorCfg(
-    joint_names_expr=["wheel_[RL]_Joint"],
+WF_TRON_WHEEL_ACTUATORS = BuiltinVelocityActuatorCfg(
+    target_names_expr=("wheel_[RL]_Joint",),
     effort_limit=40.0,
-    stiffness=0.0,
     damping=0.5,
     frictionloss=0.33,
 )
@@ -38,10 +38,11 @@ WF_TRON_ARTICULATION = EntityArticulationInfoCfg(
 
 WF_TRON_CONTACT_SENSOR = ContactSensorCfg(
     name="contact_sensors",
-    subtree1="base_Link",
-    data=("found", "force"),
+    primary=ContactMatch(mode="body", pattern="base_Link", entity="robot"),
+    secondary=ContactMatch(mode="body", pattern=".*"),
+    fields=("found", "force"),
     reduce="netforce",
-    num=10,
+    num_slots=10,
 )
 
 WF_TRON_ROBOT_CFG = EntityCfg(
@@ -52,7 +53,6 @@ WF_TRON_ROBOT_CFG = EntityCfg(
         joint_vel={".*": 0.0},
     ),
     articulation=WF_TRON_ARTICULATION,
-    sensors=(WF_TRON_CONTACT_SENSOR,),
 )
 
 if __name__ == "__main__":

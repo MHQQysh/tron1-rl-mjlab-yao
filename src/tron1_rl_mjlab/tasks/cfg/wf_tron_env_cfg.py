@@ -1,7 +1,6 @@
 import math
 
 from mjlab.envs import ManagerBasedRlEnvCfg
-from mjlab.envs.mdp.actions import JointPositionActionCfg
 from mjlab.managers.action_manager import ActionTermCfg
 from mjlab.managers.command_manager import CommandTermCfg
 from mjlab.managers.curriculum_manager import CurriculumTermCfg
@@ -15,7 +14,7 @@ from mjlab.sim import MujocoCfg, SimulationCfg
 from mjlab.utils.noise import GaussianNoiseCfg
 from mjlab.viewer import ViewerConfig
 
-from ...assets import WF_TRON_ROBOT_CFG
+from ...assets.wf_tron.wf_tron import WF_TRON_ROBOT_CFG, WF_TRON_CONTACT_SENSOR
 from .terrain_cfg import TERRAINS_IMPORTER_CFG
 from .. import mdp
 
@@ -24,6 +23,7 @@ SCENE_CFG = SceneCfg(
     extent=1.0,
     terrain=TERRAINS_IMPORTER_CFG,
     entities={"robot": WF_TRON_ROBOT_CFG},
+    sensors=(WF_TRON_CONTACT_SENSOR,),
 )
 
 VIEWER_CONFIG = ViewerConfig(
@@ -67,7 +67,7 @@ def make_commands() -> dict[str, CommandTermCfg]:
 def make_actions() -> dict[str, ActionTermCfg]:
     """Create action configurations."""
     return {
-        "joint_pos": JointPositionActionCfg(
+        "joint_pos": mdp.JointPositionActionCfg(
             entity_name="robot",
             actuator_names=("abad_[RL]_Joint", "hip_[RL]_Joint", "knee_[RL]_Joint"),
             scale=0.5,
@@ -197,10 +197,9 @@ def make_events() -> dict[str, EventTermCfg]:
             params={"asset_cfg": SceneEntityCfg("robot")},
         ),
         "add_base_mass": EventTermCfg(
-            func=mdp.randomize_field,
+            func=mdp.dr.body_mass,
             mode="startup",
             params={
-                "field": "body_mass",
                 "ranges": (-2.0, 5.0),
                 "operation": "add",
                 "distribution": "uniform",
@@ -208,10 +207,9 @@ def make_events() -> dict[str, EventTermCfg]:
             },
         ),
         "add_link_mass": EventTermCfg(
-            func=mdp.randomize_field,
+            func=mdp.dr.body_mass,
             mode="startup",
             params={
-                "field": "body_mass",
                 "ranges": (0.8, 1.2),
                 "operation": "scale",
                 "distribution": "uniform",
@@ -219,10 +217,9 @@ def make_events() -> dict[str, EventTermCfg]:
             },
         ),
         "robot_physics_material": EventTermCfg(
-            func=mdp.randomize_field,
+            func=mdp.dr.geom_friction,
             mode="startup",
             params={
-                "field": "geom_friction",
                 "ranges": {
                     0: (0.4, 1.2),  # Static friction
                     1: (0.2, 0.9),  # Dynamic friction (torsional)
@@ -234,10 +231,9 @@ def make_events() -> dict[str, EventTermCfg]:
             },
         ),
         "robot_center_of_mass": EventTermCfg(
-            func=mdp.randomize_field,
+            func=mdp.dr.body_com_offset,
             mode="startup",
             params={
-                "field": "body_ipos",
                 "ranges": {
                     0: (-0.075, 0.075),  # X axis
                     1: (-0.075, 0.075),  # Y axis
@@ -265,7 +261,7 @@ def make_events() -> dict[str, EventTermCfg]:
             },
         ),
         "reset_robot_joints": EventTermCfg(
-            func=mdp.reset_joints_by_scale,
+            func=mdp.reset_joints_by_offset,
             mode="reset",
             params={
                 "position_range": (-0.2, 0.2),
@@ -273,10 +269,9 @@ def make_events() -> dict[str, EventTermCfg]:
             },
         ),
         "randomize_joint_stiffness": EventTermCfg(
-            func=mdp.randomize_field,
+            func=mdp.dr.joint_stiffness,
             mode="reset",
             params={
-                "field": "jnt_stiffness",
                 "ranges": (0.5, 2.0),
                 "operation": "scale",
                 "distribution": "log_uniform",
@@ -284,10 +279,9 @@ def make_events() -> dict[str, EventTermCfg]:
             },
         ),
         "randomize_joint_damping": EventTermCfg(
-            func=mdp.randomize_field,
+            func=mdp.dr.joint_damping,
             mode="reset",
             params={
-                "field": "dof_damping",
                 "ranges": (0.5, 2.0),
                 "operation": "scale",
                 "distribution": "log_uniform",
