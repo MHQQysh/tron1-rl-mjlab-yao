@@ -1,4 +1,5 @@
 import math
+from copy import deepcopy
 
 from mjlab.envs import ManagerBasedRlEnvCfg
 from mjlab.managers.action_manager import ActionTermCfg
@@ -426,7 +427,7 @@ SIM_CFG = SimulationCfg(
 
 
 def make_wf_tron_env_cfg() -> ManagerBasedRlEnvCfg:
-    """Factory function to create WF-TRON environment configuration."""
+    """Factory function to create WF-TRON environment configuration for training."""
     return ManagerBasedRlEnvCfg(
         scene=SCENE_CFG,
         observations=make_observations(),
@@ -445,6 +446,6 @@ def make_wf_tron_env_cfg() -> ManagerBasedRlEnvCfg:
 
 def make_wf_tron_play_env_cfg() -> ManagerBasedRlEnvCfg:
     """Factory function to create WF-TRON environment configuration for play."""
-    env_cfg = make_wf_tron_env_cfg()
+    env_cfg = deepcopy(make_wf_tron_env_cfg())
     env_cfg.scene.num_envs = 8
     return env_cfg
