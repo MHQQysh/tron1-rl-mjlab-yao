@@ -443,6 +443,8 @@ def make_wf_tron_env_cfg() -> ManagerBasedRlEnvCfg:
         seed=0,
     )
 
-
-# Backwards compatibility alias
-WfTronEnvCfg = make_wf_tron_env_cfg
+def make_wf_tron_play_env_cfg() -> ManagerBasedRlEnvCfg:
+    """Factory function to create WF-TRON environment configuration for play."""
+    env_cfg = make_wf_tron_env_cfg()
+    env_cfg.scene.num_envs = 8
+    return env_cfg
