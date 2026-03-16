@@ -111,7 +111,7 @@ def make_observations() -> dict[str, ObservationGroupCfg]:
             func=mdp.joint_pos_rel,
             params={"asset_cfg": SceneEntityCfg(
                 name="robot",
-                joint_names=["abad_[RL]_Joint", "hip_[RL]_Joint", "knee_[RL]_Joint"]
+                joint_names=("abad_[RL]_Joint", "hip_[RL]_Joint", "knee_[RL]_Joint")
             )},
             noise=GaussianNoiseCfg(mean=0.0, std=0.01),
             scale=1.0,
@@ -138,7 +138,7 @@ def make_observations() -> dict[str, ObservationGroupCfg]:
             func=mdp.joint_pos_rel,
             params={"asset_cfg": SceneEntityCfg(
                 name="robot",
-                joint_names=["abad_[RL]_Joint", "hip_[RL]_Joint", "knee_[RL]_Joint"]
+                joint_names=("abad_[RL]_Joint", "hip_[RL]_Joint", "knee_[RL]_Joint")
             )},
             scale=1.0,
         ),
@@ -443,6 +443,7 @@ def make_wf_tron_env_cfg() -> ManagerBasedRlEnvCfg:
         episode_length_s=20.0,
         seed=0,
     )
+
 
 def make_wf_tron_play_env_cfg() -> ManagerBasedRlEnvCfg:
     """Factory function to create WF-TRON environment configuration for play."""

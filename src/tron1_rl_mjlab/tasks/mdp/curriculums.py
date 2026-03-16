@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import torch
 
-from mjlab.entity import Entity
 from mjlab.managers.scene_entity_config import SceneEntityCfg
 
 from .commands import UniformWorldPoseCommandCfg
