@@ -8,6 +8,7 @@ from typing import Literal
 
 import torch
 import tyro
+import wandb
 
 from mjlab.envs import ManagerBasedRlEnv
 from mjlab.rl import MjlabOnPolicyRunner, RslRlVecEnvWrapper
@@ -41,6 +42,42 @@ class PlayConfig:
 
     # Internal flag used by demo script.
     _demo_mode: tyro.conf.Suppress[bool] = False
+
+
+def resolve_wandb_run_path(run_path: str) -> str:
+    """Resolve wandb run path, auto-detecting latest run if needed.
+
+    Args:
+        run_path: Can be "entity/project" or "entity/project/run_id"
+
+    Returns:
+        Complete run path in format "entity/project/run_id"
+    """
+    parts = run_path.split("/")
+
+    if len(parts) == 3:
+        # Full path with run_id, use as-is
+        print(f"[INFO] Using specified run: {run_path}")
+        return run_path
+    elif len(parts) == 2:
+        # entity/project provided, get latest run
+        entity, project = parts[0], parts[1]
+        print(f"[INFO] Fetching latest run from {entity}/{project}...")
+
+        api = wandb.Api()
+        runs = api.runs(f"{entity}/{project}", order="-created_at")
+        if len(runs) == 0:
+            raise ValueError(f"No runs found in {entity}/{project}")
+
+        latest_run = runs[0]
+        resolved_path = f"{entity}/{project}/{latest_run.id}"
+        print(f"[INFO] Found latest run: {latest_run.name} (id: {latest_run.id})")
+        return resolved_path
+    else:
+        raise ValueError(
+            f"Invalid wandb_run_path format: {run_path}. "
+            "Expected 'entity/project' or 'entity/project/run_id'"
+        )
 
 
 def run_play(task_id: str, cfg: PlayConfig):
@@ -128,10 +165,16 @@ def run_play(task_id: str, cfg: PlayConfig):
         else:
             if cfg.wandb_run_path is None:
                 raise ValueError(
-                    "`wandb_run_path` is required when `checkpoint_file` is not provided."
+                    "`wandb_run_path` is required when `checkpoint_file` is not provided.\n"
+                    "Provide either:\n"
+                    "  --checkpoint-file /path/to/model.pt (local checkpoint)\n"
+                    "  --wandb-run-path entity/project (latest run)\n"
+                    "  --wandb-run-path entity/project/run_id (specific run)"
                 )
+            # Resolve wandb run path (auto-detect latest if needed)
+            wandb_run_path = resolve_wandb_run_path(cfg.wandb_run_path)
             resume_path, was_cached = get_wandb_checkpoint_path(
-                log_root_path, Path(cfg.wandb_run_path), cfg.wandb_checkpoint_name
+                log_root_path, Path(wandb_run_path), cfg.wandb_checkpoint_name
             )
             # Extract run_id and checkpoint name from path for display.
             run_id = resume_path.parent.name

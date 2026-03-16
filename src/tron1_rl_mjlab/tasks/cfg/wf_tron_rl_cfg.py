@@ -7,7 +7,8 @@ def make_wf_tron_rl_cfg() -> RslRlOnPolicyRunnerCfg:
         num_steps_per_env=24,
         max_iterations=15000,
         save_interval=200,
-        experiment_name="wf_tron_1a",
+        wandb_project="mjlab_wf_tron",
+        experiment_name="wf_tron",
         actor=RslRlModelCfg(
             hidden_dims=(512, 256, 128),
             activation="elu",
