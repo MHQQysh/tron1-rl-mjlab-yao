@@ -1,4 +1,4 @@
-from mjlab.terrains import TerrainImporterCfg, TerrainGeneratorCfg
+from mjlab.terrains import TerrainEntityCfg, TerrainGeneratorCfg
 from mjlab.terrains import (
     BoxRandomGridTerrainCfg,
     HfRandomUniformTerrainCfg,
@@ -37,9 +37,13 @@ TERRAINS_CFG = TerrainGeneratorCfg(
     }
 )
 
-TERRAINS_IMPORTER_CFG = TerrainImporterCfg(
+TERRAINS_ENTITY_CFG = TerrainEntityCfg(
     terrain_type="generator",
     terrain_generator=TERRAINS_CFG,
     max_init_terrain_level=5,
     env_spacing=2.5,
+)
+
+PLANE_ENTITY_CFG = TerrainEntityCfg(
+    terrain_type="plane"
 )

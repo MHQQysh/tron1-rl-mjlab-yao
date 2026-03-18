@@ -41,7 +41,7 @@ WF_TRON_CONTACT_SENSOR = ContactSensorCfg(
 WF_TRON_ROBOT_CFG = EntityCfg(
     spec_fn=get_spec,
     init_state=EntityCfg.InitialStateCfg(
-        pos=(0.0, 0.0, 0.8+0.166),
+        pos=(0.0, 0.0, 0.8 + 0.166),
         joint_pos={".*": 0.0},
         joint_vel={".*": 0.0},
     ),
@@ -51,5 +51,14 @@ WF_TRON_ROBOT_CFG = EntityCfg(
 if __name__ == "__main__":
     import mujoco.viewer as viewer
 
-    robot = Entity(WF_TRON_ROBOT_CFG)
-    viewer.launch(robot.spec.compile())
+    from mjlab.scene import SceneCfg, Scene
+    from mjlab.terrains import TerrainEntityCfg
+
+    SCENE_CFG = SceneCfg(
+        terrain=TerrainEntityCfg(terrain_type="plane"),
+        entities={"robot": WF_TRON_ROBOT_CFG},
+    )
+
+    scene = Scene(SCENE_CFG, device="cuda:0")
+
+    viewer.launch(scene.compile())

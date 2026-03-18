@@ -15,16 +15,15 @@ from mjlab.sim import MujocoCfg, SimulationCfg
 from mjlab.utils.noise import GaussianNoiseCfg
 from mjlab.viewer import ViewerConfig
 
-from ...assets.wf_tron.wf_tron import WF_TRON_ROBOT_CFG, WF_TRON_CONTACT_SENSOR
-from .terrain_cfg import TERRAINS_IMPORTER_CFG
+from ...assets.wf_tron.wf_tron import WF_TRON_ROBOT_CFG
+from .terrain_cfg import TERRAINS_ENTITY_CFG, PLANE_ENTITY_CFG
 from .. import mdp
 
 SCENE_CFG = SceneCfg(
     num_envs=4096,
     extent=1.0,
-    terrain=TERRAINS_IMPORTER_CFG,
+    terrain=PLANE_ENTITY_CFG,
     entities={"robot": WF_TRON_ROBOT_CFG},
-    sensors=(WF_TRON_CONTACT_SENSOR,),
 )
 
 VIEWER_CONFIG = ViewerConfig(
@@ -153,11 +152,6 @@ def make_observations() -> dict[str, ObservationGroupCfg]:
         ),
         "base_height_error": ObservationTermCfg(func=mdp.base_height_error, scale=3.0),
         "foot_rel_position_w": ObservationTermCfg(func=mdp.foot_rel_position_w, scale=1.5),
-        "contact_force": ObservationTermCfg(
-            func=mdp.contact_forces,
-            params={"asset_cfg": SceneEntityCfg("robot"), "sensor_name": "contact_sensors"},
-            scale=0.001
-        ),
     }
 
     return {
@@ -422,7 +416,6 @@ SIM_CFG = SimulationCfg(
         timestep=0.005,
         iterations=1,
     ),
-    contact_sensor_maxmatch=100,  # Increase max contacts from default 50 to avoid overflow warnings
 )
 
 
