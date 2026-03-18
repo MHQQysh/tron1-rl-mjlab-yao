@@ -414,8 +414,11 @@ def make_curriculum() -> dict[str, CurriculumTermCfg]:
 SIM_CFG = SimulationCfg(
     mujoco=MujocoCfg(
         timestep=0.005,
-        iterations=1,
+        iterations=10,
+        ls_iterations=20,
     ),
+    nconmax=256,
+    njmax=512,
 )
 
 
