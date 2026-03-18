@@ -44,7 +44,7 @@ def make_commands() -> dict[str, CommandTermCfg]:
             body_name="base_Link",
             resampling_time_range=(5.0, 10.0),
             resampling_time_scale=(0.5, 5.0),
-            debug_vis=False,
+            debug_vis=True,
             ranges=mdp.UniformWorldPoseCommandCfg.Ranges(
                 # pos lin
                 pos_x=(-0.2, 0.2),  # min max [m]
