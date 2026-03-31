@@ -161,11 +161,27 @@ def resolve_callable(callable_or_name: type | Callable | str) -> Callable:
         else:
             raise ImportError(f"Could not resolve '{callable_or_name}': no valid module.attr split found")
 
-    # Simple name - look for it in rsl_rl
-    for _, module_name, _ in pkgutil.iter_modules(rsl_rl.__path__, "rsl_rl."):
-        module = importlib.import_module(module_name)
-        if hasattr(module, callable_or_name):
-            return getattr(module, callable_or_name)
+    # Simple name - look for it in rsl_rl (recursive, handles namespace package layout)
+    def _find_in_pkg(pkg_path, prefix: str, name: str, depth: int = 3) -> Callable | None:
+        for _, mod_name, ispkg in pkgutil.iter_modules(pkg_path, prefix):
+            try:
+                mod = importlib.import_module(mod_name)
+            except Exception:
+                continue
+            if hasattr(mod, name):
+                return getattr(mod, name)
+            if ispkg and depth > 0:
+                try:
+                    result = _find_in_pkg(mod.__path__, mod_name + ".", name, depth - 1)
+                    if result is not None:
+                        return result
+                except Exception:
+                    continue
+        return None
+
+    found = _find_in_pkg(rsl_rl.__path__, "rsl_rl.", callable_or_name)
+    if found is not None:
+        return found
 
     # Raise error if no approach worked
     raise ValueError(

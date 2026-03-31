@@ -44,6 +44,20 @@ class PlayConfig:
     _demo_mode: tyro.conf.Suppress[bool] = False
 
 
+def normalize_cli_args(argv: list[str]) -> list[str]:
+    """Map compatibility flags to the canonical Tyro option names."""
+    normalized: list[str] = []
+    for arg in argv:
+        if arg == "--checkpoint":
+            normalized.append("--checkpoint-file")
+        else:
+            normalized.append(arg)
+    return normalized
+
+
+
+
+
 def resolve_wandb_run_path(run_path: str) -> str:
     """Resolve wandb run path, auto-detecting latest run if needed.
 
@@ -267,6 +281,7 @@ def main():
         return_unknown_args=True,
         config=mjlab.TYRO_FLAGS,
     )
+    remaining_args = normalize_cli_args(remaining_args)
 
     # Parse the rest of the arguments + allow overriding env_cfg and agent_cfg.
     agent_cfg = load_rl_cfg(chosen_task)

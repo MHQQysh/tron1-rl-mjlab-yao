@@ -20,7 +20,7 @@ from .terrain_cfg import TERRAINS_ENTITY_CFG, PLANE_ENTITY_CFG
 from .. import mdp
 
 SCENE_CFG = SceneCfg(
-    num_envs=4096,
+    num_envs=2048,
     extent=1.0,
     terrain=PLANE_ENTITY_CFG,
     entities={"robot": WF_TRON_ROBOT_CFG},
